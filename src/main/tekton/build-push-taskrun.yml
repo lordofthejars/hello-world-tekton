@@ -1,0 +1,19 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: build-app-run
+spec:
+  params:
+    - name: quay-credentials-secret
+      value: quay-credentials
+  resources:
+    inputs:
+      - name: source
+        resourceRef:
+          name: git-source
+    outputs:
+      - name: builtImage
+        resourceRef:
+          name: hello-world-image
+  taskRef:
+    name: build-app
