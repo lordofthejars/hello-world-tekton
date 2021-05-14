@@ -5,7 +5,7 @@ metadata:
 spec:
   params:
     - name: deploymentFile
-      value: src/main/kubernetes/deployment.yml
+      value: src/main/kubernetes/kubernetes.yml
   resources:
     inputs:
       - name: source

@@ -23,7 +23,7 @@ spec:
       - name: DESTINATION_IMAGE
         value: "$(inputs.resources.builtImage.url)"
       - name: DEPLOYMENT_FILE
-        value: "$(inputs.params.deploymentFile)"
+        value: "/workspace/source/$(inputs.params.deploymentFile)"
       
   - name: kubeconfig
     image: quay.io/rhdevelopers/tutorial-tools:0.0.3

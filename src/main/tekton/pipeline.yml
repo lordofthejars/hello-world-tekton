@@ -1,0 +1,38 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: hello-world-pipeline
+spec:
+  resources:
+    - name: appSource
+      type: git
+    - name: containerImage
+      type: image
+  tasks:
+    - name: build-app
+      taskRef:
+        name: build-app
+      params:
+        - name: quay-credentials-secret
+          value: quay-credentials
+      resources:
+        inputs:
+          - name: source
+            resource: appSource
+        outputs:
+          - name: builtImage
+            resource: containerImage
+    - name: kube-deploy
+      taskRef:
+        name: kubectl-deploy
+      params:
+        - name: deploymentFile
+          value: src/main/kubernetes/deployment.yml
+      runAfter:
+        - build-app
+      resources:
+        inputs:
+          - name: source
+            resource: appSource
+          - name: builtImage
+            resource: containerImage
