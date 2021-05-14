@@ -1,0 +1,35 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: kubectl-deploy
+spec:
+  params:
+  - name: deploymentFile
+    type: string
+    description: deployment file location
+  resources:
+    inputs:
+      - name: source
+        type: git
+      - name: builtImage
+        type: image
+  steps:
+  - name: update-deployment-file
+    image: quay.io/lordofthejars/image-updater:1.0.0
+    script: |
+      #!/usr/bin/env ash
+      yq eval -i '.spec.template.spec.containers[0].image = env(DESTINATION_IMAGE)' $DEPLOYMENT_FILE
+    env:
+      - name: DESTINATION_IMAGE
+        value: "$(inputs.resources.builtImage.url)"
+      - name: DEPLOYMENT_FILE
+        value: "$(inputs.params.deploymentFile)"
+      
+  - name: kubeconfig
+    image: quay.io/rhdevelopers/tutorial-tools:0.0.3
+    command: ["kubectl"]
+    args:
+      - apply
+      - -f
+      - /workspace/source/$(inputs.params.deploymentFile)
+  
